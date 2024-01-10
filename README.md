@@ -42,3 +42,20 @@ Now you have everything you need to configure your bot! In the files you downloa
 Use the email associated with the character you made earlier, as well as the password. Fill in the character name, if it has a space in it, use a | instead. Like... 'Havarti|Dreams' instead of 'Havarti Dreams'. Colors and desc are asthetic only, but fill them in if you like! The owner allows you to assign a character as the bot owner, who can issue it commands.
 
 Very importantly, the webhookurl is the url you copied earlier while creating your webhook. The bot won't know where to send the notifications if you don't fill this in.
+
+## Running the bot
+
+In the directory you extracted havarti into, open command prompt or terminal
+Start the bot with the command **py kiwibot.py**
+
+Your bot should log in to wherever you last logged out of it, now when the text {'furre name} has arrived!' appears in the dream your bot is in, it'll call the discord webhook and forward the notification to discord!
+
+![image](https://github.com/JamieMouse/havarti/assets/155923040/da99faf9-3413-410d-a4c9-1ec3211db916)
+
+
+## Troubleshooting
+
+### ModuleNotFoundError: No module named 'requests'
+
+You'll need to install the requests module, use the command **pip3 install requests**
+
