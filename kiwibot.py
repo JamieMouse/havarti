@@ -5,6 +5,7 @@ import socket
 import json
 import time
 import re
+import requests
 
 ## GLOBAL DEBUG FLAG ##
 debug_mode = False
@@ -113,6 +114,15 @@ def parseSaying(socket, string):
     formatted = f'{sayer}: {said}'
     prettyPrint(formatted)
 
+def parseEmit(socket, string):
+    emit = re.search(r'\(<font color=\'dragonspeak\'><img src=\'fsh://system.fsh:91\' alt=\'@emit\' /><channel name=\'@emit\' />(.*)</font>', string)
+    
+    name = emit.group(1)
+    if (name.endswith('has arrived!') and not name.startswith('DreamNova')):
+        prettyPrint(name)
+        data = {'content':name}
+        requests.post(webhookurl, json=data)
+
 def parseEmotes(socket, string):
     emote = re.search(r'\(\<font\scolor\=\'emote\'\>\<name\sshortname\=\'[^\']+\'\>([^\<]+)\<\/name\>\s(.*)\<\/font\>', string)
     emoter = emote.group(1)
@@ -161,6 +171,9 @@ def parseFurc(socket, msg):
     if saying.match(msg):
         parseSaying(socket, msg)
 
+    emit = re.compile(r'\(<font color=\'dragonspeak\'><img src=\'fsh://system.fsh:91\' alt=\'@emit\' /><channel name=\'@emit\' />(.*)')
+    if emit.match(msg):
+        parseEmit(socket, msg)
 
 configure_logger()
 
@@ -183,6 +196,10 @@ password = conf['account'][0]['password']
 colors = conf['account'][0]['colors']
 desc = conf['account'][0]['desc']
 owner = conf['account'][0]['owner']
+
+# discord integration
+webhookurl = conf['discord'][0]['webhookurl']
+
 # append desc with script info
 desc = desc + f' [{app_name} {app_vers}]'
 
