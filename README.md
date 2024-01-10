@@ -30,6 +30,8 @@ I like to make a specific channel in my discord server for bots to post their me
 
 4) Download the Havarti bot package
 
+https://github.com/JamieMouse/havarti/tree/main
+
 If you're not comfortable with git, you can use the download zip button! Just remember to extract the files.
 ![image](https://github.com/JamieMouse/havarti/assets/155923040/0bb7e2fa-f463-4e9e-99ce-af80a639e7f6)
 
