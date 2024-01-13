@@ -148,9 +148,9 @@ def parseFurc(socket, msg):
         sendMsg(socket, 'vascodagama')
 
     # SUMMONING - would need to figure out to format the owner name appropriately; this could also be hardcoded.
-    # summoned = re.compile(r'\(<font color=\'query\'><name shortname=\'owner_name\'>owner_name<\/name> asks you to join their company.*')
-    # if summoned.match(msg):
-    #    sendMsg(socket, 'join')
+    summoned = re.compile(rf'\(<font color=\'query\'><name shortname=\'{ownerShortName}\'>{owner}<\/name> asks you to join their company.*')
+    if summoned.match(msg):
+       sendMsg(socket, 'join')
 
     load_dream = re.compile(r'^]q')
     if load_dream.match(msg):
@@ -191,6 +191,7 @@ password = conf['account'][0]['password']
 colors = conf['account'][0]['colors']
 desc = conf['account'][0]['desc']
 owner = conf['account'][0]['owner']
+ownerShortName = owner.replace('|', '').lower()
 
 # discord integration
 webhookurl = conf['discord'][0]['webhookurl']
