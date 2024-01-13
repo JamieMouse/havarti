@@ -33,9 +33,9 @@ def prettyPrint(msg):
 
 def stayAlive(socket, action):
     if action == 'jiggle':
-        sendMsg(socket, '>')
+        sendMsg(socket, '>', False)
         time.sleep(1)
-        sendMsg(socket, '<')
+        sendMsg(socket, '<', False)
 
 def readMsg(socket):
     message = b''
@@ -47,7 +47,7 @@ def readMsg(socket):
             return message
         message += data
 
-def sendMsg(socket, msg):
+def sendMsg(socket, msg, log = True):
     print_exclusions = [
         '>',
         '<',
@@ -60,7 +60,7 @@ def sendMsg(socket, msg):
         'stand'
     ]
     if type(msg) == str:
-        if msg not in print_exclusions:
+        if log:
             print(f'[SEND] {msg}')
         logging.info(msg)
         msg = msg.encode('iso-8859-1')
@@ -143,7 +143,7 @@ def removeParen(string):
 
 def parseFurc(socket, msg):
     if msg == 'Dragonroar':
-        sendMsg(socket, f'account {email} {character} {password}')
+        sendMsg(socket, f'account {email} {character} {password}', False) # Do not log the login details...
         sendMsg(socket, f'color {colors}')
         sendMsg(socket, f'desc {desc}')
 
@@ -180,8 +180,6 @@ configure_logger()
 # load configuration
 conf = open('bot.conf', "r")
 conf = json.load(conf)
-if debug_mode:
-    logging.debug(conf)
 
 # global declarations
 hostname = conf['connection'][0]['server']
