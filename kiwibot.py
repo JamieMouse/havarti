@@ -8,8 +8,11 @@ import re
 import requests
 
 ## GLOBAL DEBUG FLAG ##
-debug_mode = False
+debug_mode = True
 #######################
+
+welcomeMessageSet = False
+WelcomeMessage = ""
 
 # logging configuration
 def configure_logger():
@@ -92,6 +95,13 @@ def parseWhispers(socket, string):
             say_string = f'\"{say_string}'
             sendMsg(socket, say_string)
 
+        setWelcome = re.match('setWelcome:(.*)', message)
+        if setWelcome:
+            global welcomeMessageSet
+            global WelcomeMessage
+            welcomeMessageSet = True
+            WelcomeMessage = setWelcome.group(1)
+
     return
 
 def parseSaying(socket, string):
@@ -105,11 +115,15 @@ def parseSaying(socket, string):
 def parseEmit(socket, string):
     emit = re.search(r'\(<font color=\'dragonspeak\'><img src=\'fsh://system.fsh:91\' alt=\'@emit\' /><channel name=\'@emit\' />(.*)</font>', string)
     
-    name = emit.group(1)
-    if (name.endswith('has arrived!') and not name.strip().startswith('DreamNova')):
-        prettyPrint(name)
-        data = {'content':name}
-        requests.post(webhookurl, json=data)
+    emitMessage = emit.group(1)
+    if (emitMessage.endswith(' has arrived!')):
+        furreArrived = emitMessage.removesuffix(' has arrived!').strip()
+        if (furreArrived != 'DreamNova'):
+            prettyPrint(furreArrived)
+            data = {'content':f'{furreArrived} has arrived!'}
+            requests.post(webhookurl, json=data)
+            if welcomeMessageSet:
+                sendMsg(socket, f'wh {furreArrived} {WelcomeMessage}!')
 
 def parseEmotes(socket, string):
     emote = re.search(r'\(\<font\scolor\=\'emote\'\>\<name\sshortname\=\'[^\']+\'\>([^\<]+)\<\/name\>\s(.*)\<\/font\>', string)
@@ -168,7 +182,7 @@ def parseFurc(socket, msg):
     if saying.match(msg):
         parseSaying(socket, msg)
 
-    emit = re.compile(r'\(<font color=\'dragonspeak\'><img src=\'fsh://system.fsh:91\' alt=\'@emit\' /><channel name=\'@emit\' />(.*)')
+    emit = re.compile(r'\(<font color=\'dragonspeak\'><img src=\'fsh://system.fsh:91\' alt=\'@emit\' /><channel name=\'@emit\' />(.*)</font>')
     if emit.match(msg):
         parseEmit(socket, msg)
 
