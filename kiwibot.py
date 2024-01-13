@@ -25,7 +25,7 @@ def configure_logger():
         format='%(asctime)s [%(levelname)s] %(message)s',
         datefmt='%m-%d-%Y %H:%M:%S%z'
         )
-    logging.info(f'START')
+    prettyPrint(f'START')
 
 def prettyPrint(msg):
     print(f'[>] {msg}')
@@ -48,21 +48,9 @@ def readMsg(socket):
         message += data
 
 def sendMsg(socket, msg, log = True):
-    print_exclusions = [
-        '>',
-        '<',
-        'm 1',
-        'm 3',
-        'm 7',
-        'm 9',
-        'lie',
-        'sit',
-        'stand'
-    ]
     if type(msg) == str:
         if log:
-            print(f'[SEND] {msg}')
-        logging.info(msg)
+            prettyPrint(f'[SEND] {msg}')
         msg = msg.encode('iso-8859-1')
     socket.send(msg + b'\n')
 
@@ -141,13 +129,22 @@ def removeParen(string):
     cleaned_string = paren_re.sub('', string)
     return cleaned_string
 
+def parseServerMessage(msg):
+    if debug_mode:
+        prettyPrint(f'[>] {msg}')
+    if msg == ']#xxxx 0 Whoops! The username and password do not match -- please check your spelling.':
+        prettyPrint('Authentication failed')
+        quit()
+
 def parseFurc(socket, msg):
     if msg == 'Dragonroar':
+        prettyPrint("The server requests authentication info... attempting to log in")
         sendMsg(socket, f'account {email} {character} {password}', False) # Do not log the login details...
         sendMsg(socket, f'color {colors}')
         sendMsg(socket, f'desc {desc}')
 
     if msg == '&&&&&&&&&&&&&':
+        prettyPrint("Login was successful")
         sendMsg(socket, 'vascodagama')
 
     # SUMMONING - would need to figure out to format the owner name appropriately; this could also be hardcoded.
@@ -207,9 +204,9 @@ furc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 try:
     furc.connect((hostname, port))
     connected = True
-    logging.info(f'Connected to {hostname}:{port}')
+    prettyPrint(f'Connected to {hostname}:{port}')
 except:
-    logging.error(f'Failed connection to {hostname}:{port}')
+    prettyPrint(f'Failed connection to {hostname}:{port}')
 
 t0 = time.time()
 while furc._closed == False:
@@ -219,12 +216,11 @@ while furc._closed == False:
         t0 = t1
     try:
         msg = readMsg(furc).decode('iso-8859-1')
-        if debug_mode:
-            print(f'[>] {msg}')
+        parseServerMessage(msg)
         parseFurc(furc, msg)
     except TimeoutError:
         furc.close()
-        logging.warning(f'Connection has timed out.')
+        prettyPrint(f'Connection has timed out.')
 
 if furc._closed == True:
-    logging.info(f'Connection has closed.')
+    prettyPrint(f'Connection has closed.')
