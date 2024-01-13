@@ -106,7 +106,7 @@ def parseEmit(socket, string):
     emit = re.search(r'\(<font color=\'dragonspeak\'><img src=\'fsh://system.fsh:91\' alt=\'@emit\' /><channel name=\'@emit\' />(.*)</font>', string)
     
     name = emit.group(1)
-    if (name.endswith('has arrived!') and not name.startswith('DreamNova')):
+    if (name.endswith('has arrived!') and not name.strip().startswith('DreamNova')):
         prettyPrint(name)
         data = {'content':name}
         requests.post(webhookurl, json=data)
